@@ -10,12 +10,12 @@ use Illuminate\Http\JsonResponse;
 
 class IndexProductController extends Controller
 {
-    public function __construct(private ProductService $todoService) {}
+    public function __construct(private ProductService $productService) {}
 
     public function __invoke(): JsonResponse
     {
-        $todos = $this->todoService->index();
+        $products = $this->productService->index();
 
-        return response()->json($todos);
+        return response()->json($products);
     }
 }
