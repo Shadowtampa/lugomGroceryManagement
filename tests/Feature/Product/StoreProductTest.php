@@ -33,9 +33,10 @@ class StoreProductTest extends TestCase
             'nome' => 'Arroz',
             'preco' => 10.50,
             'quantidade_estoque' => 5,
+            'estoque_desejavel' => 10,
             'foto' => 'https://exemplo.com/arroz.jpg',
             'local_compra' => 'Supermercado',
-            'local_casa' => 'Armario Preto',
+            'local_casa' => 'Armário Preto',
             'departamento' => 'Alimentos',
             'unidade_medida' => UnidadeMedida::KG->value
         ];
@@ -51,6 +52,7 @@ class StoreProductTest extends TestCase
                     'nome',
                     'preco',
                     'quantidade_estoque',
+                    'estoque_desejavel',
                     'foto',
                     'local_compra',
                     'local_casa',
@@ -67,9 +69,10 @@ class StoreProductTest extends TestCase
                     'nome' => 'Arroz',
                     'preco' => 10.50,
                     'quantidade_estoque' => 5,
+                    'estoque_desejavel' => 10,
                     'foto' => 'https://exemplo.com/arroz.jpg',
                     'local_compra' => 'Supermercado',
-                    'local_casa' => 'Armario Preto',
+                    'local_casa' => 'Armário Preto',
                     'departamento' => 'Alimentos',
                     'unidade_medida' => UnidadeMedida::KG->value,
                     'families_id' => $this->family->id
@@ -80,9 +83,10 @@ class StoreProductTest extends TestCase
             'nome' => 'Arroz',
             'preco' => 10.50,
             'quantidade_estoque' => 5,
+            'estoque_desejavel' => 10,
             'foto' => 'https://exemplo.com/arroz.jpg',
             'local_compra' => 'Supermercado',
-            'local_casa' => 'Armario Preto',
+            'local_casa' => 'Armário Preto',
             'departamento' => 'Alimentos',
             'unidade_medida' => UnidadeMedida::KG->value,
             'families_id' => $this->family->id
@@ -95,6 +99,7 @@ class StoreProductTest extends TestCase
             'nome' => 'Arroz',
             'preco' => 10.50,
             'quantidade_estoque' => 5,
+            'estoque_desejavel' => 10,
             'unidade_medida' => UnidadeMedida::KG->value
         ];
 
@@ -109,6 +114,7 @@ class StoreProductTest extends TestCase
             'nome' => '', // nome é obrigatório
             'preco' => 'não é um número', // preço deve ser numérico
             'quantidade_estoque' => -1, // quantidade deve ser positiva
+            'estoque_desejavel' => -1, // estoque desejável deve ser positivo
             'unidade_medida' => 'INVALIDO' // unidade de medida inválida
         ];
 
@@ -116,7 +122,7 @@ class StoreProductTest extends TestCase
             ->postJson('/api/product', $invalidData);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['nome', 'preco', 'quantidade_estoque', 'unidade_medida']);
+            ->assertJsonValidationErrors(['nome', 'preco', 'quantidade_estoque', 'estoque_desejavel', 'unidade_medida']);
     }
 
     public function test_can_create_product_with_minimal_data()

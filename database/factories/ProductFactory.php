@@ -17,6 +17,7 @@ class ProductFactory extends Factory
             'nome' => $this->faker->word,
             'preco' => $this->faker->randomFloat(2, 1, 100),
             'quantidade_estoque' => $this->faker->numberBetween(0, 100),
+            'estoque_desejavel' => $this->faker->numberBetween(10, 50),
             'foto' => $this->faker->imageUrl(),
             'local_compra' => $this->faker->company,
             'local_casa' => $this->faker->randomElement([

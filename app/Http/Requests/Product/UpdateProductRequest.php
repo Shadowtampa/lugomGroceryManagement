@@ -27,6 +27,7 @@ class UpdateProductRequest extends FormRequest
             'nome' => 'nullable|required|string|max:255',
             'preco' => 'nullable|numeric|min:0',
             'quantidade_estoque' => 'nullable|required|integer|min:0',
+            'estoque_desejavel' => 'nullable|integer|min:0',
             'foto' => 'nullable|string|max:255',
             'local_compra' => 'nullable|string|max:255',
             'local_casa' => 'nullable|string|max:255',

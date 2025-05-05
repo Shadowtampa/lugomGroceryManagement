@@ -33,10 +33,12 @@ class ProductService extends Service
             'nome',
             'preco',
             'quantidade_estoque',
+            'estoque_desejavel',
             'foto',
             'local_compra',
             'local_casa',
-            'departamento'
+            'departamento',
+            'unidade_medida'
         ]), ARRAY_FILTER_USE_BOTH));
 
         $product->save();

@@ -27,6 +27,7 @@ class StoreProductRequest extends FormRequest
             'nome' => 'required|string|max:255',
             'preco' => 'nullable|numeric|min:0',
             'quantidade_estoque' => 'required|integer|min:0',
+            'estoque_desejavel' => 'nullable|integer|min:0',
             'foto' => 'nullable|string|max:255',
             'local_compra' => 'nullable|string|max:255',
             'local_casa' => 'nullable|string|max:255',
