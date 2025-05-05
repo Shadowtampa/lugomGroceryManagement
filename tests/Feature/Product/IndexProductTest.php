@@ -4,6 +4,7 @@ namespace Tests\Feature\Product;
 
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Family;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,14 +16,19 @@ class IndexProductTest extends TestCase
     {
         // Criar um usuário
         $user = User::factory()->create();
+        $family = Family::factory()->create(['user_id' => $user->id]);
 
         // Criar alguns produtos para o usuário
         $products = Product::factory()->count(3)->create([
-            'user_id' => $user->id
+            'families_id' => $family->id
         ]);
 
         // Criar produtos para outro usuário (não devem aparecer na listagem)
-        Product::factory()->count(2)->create();
+        $otherUser = User::factory()->create();
+        $otherFamily = Family::factory()->create(['user_id' => $otherUser->id]);
+        Product::factory()->count(2)->create([
+            'families_id' => $otherFamily->id
+        ]);
 
         // Fazer a requisição autenticada
         $response = $this->actingAs($user)
@@ -40,7 +46,7 @@ class IndexProductTest extends TestCase
                     'foto',
                     'local_compra',
                     'departamento',
-                    'user_id',
+                    'families_id',
                     'created_at',
                     'updated_at'
                 ]

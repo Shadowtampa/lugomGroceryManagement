@@ -11,13 +11,16 @@ class ProductService extends Service
 {
     public function index()
     {
-        return Product::where("user_id", auth()->user()->id)->get();
+        $user = auth()->user();
+        return Product::whereHas('family', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->get();
     }
 
-    // public function store($request): Todo
-    // {
-    //     return Todo::create($request);
-    // }
+    public function store($request): Product
+    {
+        return Product::create($request);
+    }
 
     // public function update(array $request): Todo
     // {
@@ -32,9 +35,12 @@ class ProductService extends Service
     //     return $todo;
     // }
 
-    // public function get(int $id) : Todo
-    // {
-    //     return Todo::findOrFail($id);
-    // }
+    public function get(int $id): Product
+    {
+        $user = auth()->user();
+        return Product::whereHas('family', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->findOrFail($id);
+    }
 
 }

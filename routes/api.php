@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Product\{IndexProductController};
+use App\Http\Controllers\Product\{IndexProductController, GetProductController, StoreProductController};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +19,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 
 Route::prefix('product')->middleware('auth:sanctum')->group(function () {
     Route::get('/', IndexProductController::class); // Listar todos os todos
-    // Route::get('{id}', GetProductController::class); // Exibir um todo específico
-    // Route::post('/', StoreProductController::class); //  Criar novo todo
+    Route::get('{id}', GetProductController::class); // Exibir um todo específico
+    Route::post('/', StoreProductController::class); //  Criar novo todo
     // Route::put('{id}', UpdateProductController::class); // Atualizar todo
 });

@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Product;
-use App\Models\User;
+use App\Models\Family;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
@@ -19,7 +19,7 @@ class ProductFactory extends Factory
             'foto' => $this->faker->imageUrl(),
             'local_compra' => $this->faker->company,
             'departamento' => $this->faker->randomElement(['Alimentos', 'Bebidas', 'Limpeza', 'Higiene', 'Outros']),
-            'user_id' => User::factory()
+            'families_id' => Family::factory()
         ];
     }
 }

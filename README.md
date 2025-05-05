@@ -1,74 +1,74 @@
-# Setup Docker com Autenticação Laravel Sanctum Para Projetos Laravel (11)
-[Inspirado em EspecializaTI](https://academy.especializati.com.br)
+# Lugom Grocery Manager (LGM) - API Documentation
 
-### Passo a passo
+## Descrição
 
-Clone o repositório
+O Lugom Grocery Manager (LGM) é um sistema de gerenciamento de despensa familiar. Esta documentação descreve a API RESTful do backend, responsável por fornecer os dados e a lógica de negócios para o sistema.
 
-Crie o Arquivo .env
-```sh
-cp .env.example .env
-```
+## Tecnologias Utilizadas
 
-Atualize as variáveis de ambiente do arquivo .env
-```dosini
-APP_NAME="Laravel 11 com Autenticação"
-APP_URL=http://localhost:8989
+* PHP, Laravel
+* Banco de Dados Relacional - MySQL
 
-DB_CONNECTION=mysql
-DB_HOST=db
-DB_PORT=3306
-DB_DATABASE=laravel
-DB_USERNAME=root
-DB_PASSWORD=root
-```
+## Configuração
 
-Suba os containers do projeto
-```sh
-docker compose up -d
-```
+TODO
 
+## Endpoints da API
 
-Acessar o container
-```sh
-docker compose exec app bash
-```
+### Módulo de Produtos
 
+Este módulo é responsável por gerenciar as informações dos produtos no sistema.
 
-Instalar as dependências do projeto
-```sh
-composer install
-```
+#### **Recursos:**
 
-Rodar as migrations do projeto
-```sh
-php artisan migrate
-```
+* **Produto:** Representa um item individual na despensa ou lista de compras.
 
-Gerar a key do projeto Laravel
-```sh
-php artisan key:generate
-```
+#### **Atributos do Produto:**
 
-# Acessar o Projeto
+* `id` (inteiro): Identificador único do produto.
+* `nome` (texto): Nome do produto (obrigatório).
+* `preco` (decimal, opcional): Preço unitário do produto.
+* `quantidade_estoque` (inteiro, padrão: 0): Quantidade em estoque.
+* `foto` (texto, opcional): URL ou caminho para a foto do produto.
+* `local_compra` (texto, opcional): Local de compra do produto.
+* `departamento` (texto, opcional): Departamento do produto.
+* `created_at` (timestamp): Data de criação do produto.
+* `updated_at` (timestamp): Data da última atualização do produto.
 
-Para acessar o projeto, utilize o seguinte link:
+#### **Endpoints:**
 
-- [Projeto](http://localhost:8989)
+##### **1. Listar Produtos**
 
-# Acessar o PHPMyAdmin
-
-Para acessar o PHPMyAdmin, utilize o seguinte link:
-
-- [PHPMyAdmin](http://localhost:8080)
-
-## Credenciais
-
-- **Usuário:** `DB_USERNAME`
-- **Senha:** `DB_PASSWORD`
-
-Importar a collection de rotas que estão na raiz do projeto em: 
+* **Endpoint:** `/produtos`
+* **Verbo:** `GET`
+* **Descrição:** Retorna uma lista de todos os produtos cadastrados.
+* **Parâmetros (Opcional para o MVP):**
+    * (Ex: `?nome=Arroz`, `?departamento=Alimentos` - Filtrar por nome ou departamento)
+* **Exemplo de Resposta:**
 
 ```json
-Auth.postman_collection.json
-```
+[
+    {
+        "id": 1,
+        "nome": "Arroz Tipo 1",
+        "preco": 5.50,
+        "quantidade_estoque": 10,
+        "foto": "url_da_foto.jpg",
+        "local_compra": "Supermercado X",
+        "departamento": "Alimentos",
+        "created_at": "2024-10-26T10:00:00.000000Z",
+        "updated_at": "2024-10-26T10:00:00.000000Z"
+    },
+    {
+        "id": 2,
+        "nome": "Detergente",
+        "preco": 2.80,
+        "quantidade_estoque": 5,
+        "foto": "url_da_foto_detergente.jpg",
+        "local_compra": "Mercado Y",
+        "departamento": "Limpeza",
+        "created_at": "2024-10-26T10:11:00.000000Z",
+        "updated_at": "2024-10-26T10:11:00.000000Z"
+    },
+    ...
+]

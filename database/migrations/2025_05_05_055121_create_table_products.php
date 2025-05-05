@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('local_compra')->nullable();
             $table->string('departamento')->nullable();
 
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relacionamento com usuários
+            $table->foreignId('families_id')->constrained()->onDelete('cascade'); // Relacionamento com usuários
 
             $table->timestamps();
         });
