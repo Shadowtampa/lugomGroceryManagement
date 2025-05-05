@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Product;
 use App\Models\Family;
+use App\Enums\UnidadeMedida;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
@@ -14,11 +15,24 @@ class ProductFactory extends Factory
     {
         return [
             'nome' => $this->faker->word,
-            'preco' => $this->faker->randomFloat(2, 1, 1000),
+            'preco' => $this->faker->randomFloat(2, 1, 100),
             'quantidade_estoque' => $this->faker->numberBetween(0, 100),
             'foto' => $this->faker->imageUrl(),
             'local_compra' => $this->faker->company,
-            'departamento' => $this->faker->randomElement(['Alimentos', 'Bebidas', 'Limpeza', 'Higiene', 'Outros']),
+            'local_casa' => $this->faker->randomElement([
+                'Armário da Cozinha',
+                'Geladeira',
+                'Freezer',
+                'Dispensa',
+                'Armário do Banheiro',
+                'Armário da Sala',
+                'Quarto',
+                'Lavanderia',
+                'Garagem',
+                'Área de Serviço'
+            ]),
+            'departamento' => $this->faker->word,
+            'unidade_medida' => $this->faker->randomElement(array_column(UnidadeMedida::cases(), 'value')),
             'families_id' => Family::factory()
         ];
     }

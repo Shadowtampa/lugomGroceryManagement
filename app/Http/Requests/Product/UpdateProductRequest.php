@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Enums\UnidadeMedida;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Family;
 
@@ -28,7 +29,9 @@ class UpdateProductRequest extends FormRequest
             'quantidade_estoque' => 'nullable|required|integer|min:0',
             'foto' => 'nullable|string|max:255',
             'local_compra' => 'nullable|string|max:255',
-            'departamento' => 'nullable|string|max:255'
+            'local_casa' => 'nullable|string|max:255',
+            'departamento' => 'nullable|string|max:255',
+            'unidade_medida' => ['nullable', 'string', 'in:' . implode(',', array_column(UnidadeMedida::cases(), 'value'))]
         ];
     }
 

@@ -40,6 +40,7 @@ class UpdateProductTest extends TestCase
             'quantidade_estoque' => 10,
             'foto' => 'https://exemplo.com/arroz-atualizado.jpg',
             'local_compra' => 'Supermercado Y',
+            'local_casa' => 'Armario Vermelho',
             'departamento' => 'Alimentos'
         ];
 
@@ -54,6 +55,7 @@ class UpdateProductTest extends TestCase
                 'quantidade_estoque',
                 'foto',
                 'local_compra',
+                'local_casa',
                 'departamento',
                 'families_id',
                 'created_at',
@@ -65,6 +67,7 @@ class UpdateProductTest extends TestCase
                 'quantidade_estoque' => 10,
                 'foto' => 'https://exemplo.com/arroz-atualizado.jpg',
                 'local_compra' => 'Supermercado Y',
+                'local_casa' => 'Armario Vermelho',
                 'departamento' => 'Alimentos',
                 'families_id' => $this->family->id
             ]);
@@ -76,6 +79,7 @@ class UpdateProductTest extends TestCase
             'quantidade_estoque' => 10,
             'foto' => 'https://exemplo.com/arroz-atualizado.jpg',
             'local_compra' => 'Supermercado Y',
+            'local_casa' => 'Armario Vermelho',
             'departamento' => 'Alimentos',
             'families_id' => $this->family->id
         ]);

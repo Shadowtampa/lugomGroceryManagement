@@ -35,6 +35,7 @@ class ProductService extends Service
             'quantidade_estoque',
             'foto',
             'local_compra',
+            'local_casa',
             'departamento'
         ]), ARRAY_FILTER_USE_BOTH));
 

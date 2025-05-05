@@ -20,6 +20,9 @@ return new class extends Migration
             $table->string('local_compra')->nullable();
             $table->string('departamento')->nullable();
 
+            $table->string('local_casa')->nullable();
+
+
             $table->foreignId('families_id')->constrained()->onDelete('cascade'); // Relacionamento com usuários
 
             $table->timestamps();

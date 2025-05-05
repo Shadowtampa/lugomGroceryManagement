@@ -5,6 +5,7 @@ namespace Tests\Feature\Product;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Family;
+use App\Enums\UnidadeMedida;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -33,8 +34,10 @@ class StoreProductTest extends TestCase
             'preco' => 10.50,
             'quantidade_estoque' => 5,
             'foto' => 'https://exemplo.com/arroz.jpg',
-            'local_compra' => 'Supermercado X',
-            'departamento' => 'Alimentos'
+            'local_compra' => 'Supermercado',
+            'local_casa' => 'Armario Preto',
+            'departamento' => 'Alimentos',
+            'unidade_medida' => UnidadeMedida::KG->value
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->token)
@@ -50,7 +53,9 @@ class StoreProductTest extends TestCase
                     'quantidade_estoque',
                     'foto',
                     'local_compra',
+                    'local_casa',
                     'departamento',
+                    'unidade_medida',
                     'families_id',
                     'created_at',
                     'updated_at'
@@ -63,8 +68,10 @@ class StoreProductTest extends TestCase
                     'preco' => 10.50,
                     'quantidade_estoque' => 5,
                     'foto' => 'https://exemplo.com/arroz.jpg',
-                    'local_compra' => 'Supermercado X',
+                    'local_compra' => 'Supermercado',
+                    'local_casa' => 'Armario Preto',
                     'departamento' => 'Alimentos',
+                    'unidade_medida' => UnidadeMedida::KG->value,
                     'families_id' => $this->family->id
                 ]
             ]);
@@ -74,8 +81,10 @@ class StoreProductTest extends TestCase
             'preco' => 10.50,
             'quantidade_estoque' => 5,
             'foto' => 'https://exemplo.com/arroz.jpg',
-            'local_compra' => 'Supermercado X',
+            'local_compra' => 'Supermercado',
+            'local_casa' => 'Armario Preto',
             'departamento' => 'Alimentos',
+            'unidade_medida' => UnidadeMedida::KG->value,
             'families_id' => $this->family->id
         ]);
     }
@@ -85,7 +94,8 @@ class StoreProductTest extends TestCase
         $productData = [
             'nome' => 'Arroz',
             'preco' => 10.50,
-            'quantidade_estoque' => 5
+            'quantidade_estoque' => 5,
+            'unidade_medida' => UnidadeMedida::KG->value
         ];
 
         $response = $this->postJson('/api/product', $productData);
@@ -97,22 +107,24 @@ class StoreProductTest extends TestCase
     {
         $invalidData = [
             'nome' => '', // nome é obrigatório
-            'preco' => -10, // preço não pode ser negativo
-            'quantidade_estoque' => -5 // quantidade não pode ser negativa
+            'preco' => 'não é um número', // preço deve ser numérico
+            'quantidade_estoque' => -1, // quantidade deve ser positiva
+            'unidade_medida' => 'INVALIDO' // unidade de medida inválida
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->token)
             ->postJson('/api/product', $invalidData);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['nome', 'preco', 'quantidade_estoque']);
+            ->assertJsonValidationErrors(['nome', 'preco', 'quantidade_estoque', 'unidade_medida']);
     }
 
     public function test_can_create_product_with_minimal_data()
     {
         $minimalData = [
             'nome' => 'Arroz',
-            'quantidade_estoque' => 5
+            'quantidade_estoque' => 5,
+            'unidade_medida' => UnidadeMedida::KG->value
         ];
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->token)
@@ -125,6 +137,7 @@ class StoreProductTest extends TestCase
                     'id',
                     'nome',
                     'quantidade_estoque',
+                    'unidade_medida',
                     'families_id',
                     'created_at',
                     'updated_at'
@@ -135,6 +148,7 @@ class StoreProductTest extends TestCase
                 'Product' => [
                     'nome' => 'Arroz',
                     'quantidade_estoque' => 5,
+                    'unidade_medida' => UnidadeMedida::KG->value,
                     'families_id' => $this->family->id
                 ]
             ]);
@@ -142,6 +156,7 @@ class StoreProductTest extends TestCase
         $this->assertDatabaseHas('products', [
             'nome' => 'Arroz',
             'quantidade_estoque' => 5,
+            'unidade_medida' => UnidadeMedida::KG->value,
             'families_id' => $this->family->id
         ]);
     }

@@ -43,6 +43,7 @@ class GetProductTest extends TestCase
                 'quantidade_estoque',
                 'foto',
                 'local_compra',
+                'local_casa',
                 'departamento',
                 'families_id',
                 'created_at',
