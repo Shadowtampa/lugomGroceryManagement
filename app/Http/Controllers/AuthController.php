@@ -15,13 +15,15 @@ class AuthController extends Controller
         $request->validate([
             "email" => "unique:users|required|email",
             "name" => "required|max:225|min:3",
-            "password" => "required|min:3|confirmed"
+            "password" => "required|min:3|confirmed",
+            "families_id" => "exists:families,id"
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            'families_id' => $request->families_id
         ]);
 
         $token = $user->createToken($request->name);
@@ -51,5 +53,9 @@ class AuthController extends Controller
         $request->user()->tokens()->delete();
 
         return ["message" => "See you soon"];
+    }
+
+    public function me (){
+        return auth()->user();
     }
 }

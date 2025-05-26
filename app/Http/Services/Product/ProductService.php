@@ -3,6 +3,7 @@
 namespace App\Http\Services\Product;
 
 use App\Http\Services\Service;
+use App\Models\Inventory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
@@ -12,28 +13,42 @@ class ProductService extends Service
     public function index()
     {
         $user = auth()->user();
-        return Product::whereHas('family', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })->get();
+        $family = $user->family;
+
+        return $family->products()->get();
     }
 
     public function store($request): Product
     {
-        return Product::create($request);
+        $user = auth()->user();
+        $family = $user->family;
+
+        if (!$family) {
+            throw new \Exception('Família não encontrada');
+        }
+
+        $product = Product::create($request);
+
+        Inventory::create([
+            'family_id' => $family->id,
+            'product_id' => $product->id,
+            'stock' => 0,
+            'desirable_stock' => 0
+        ]);
+
+        return $product;
     }
 
     public function update(array $request): Product
     {
         $user = auth()->user();
-        $product = Product::whereHas('family', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })->findOrFail($request['product_id']);
+        $family = $user->family;
+
+        $product = $family->products()->findOrFail($request['product_id']);
 
         $product->fill(array_filter($request, fn($value, $key) => in_array($key, [
             'nome',
             'preco',
-            'quantidade_estoque',
-            'estoque_desejavel',
             'foto',
             'local_compra',
             'local_casa',
@@ -49,9 +64,28 @@ class ProductService extends Service
     public function get(int $id): Product
     {
         $user = auth()->user();
-        return Product::whereHas('family', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })->findOrFail($id);
+        $family = $user->family;
+
+        return $family->products()->findOrFail($id);
+    }
+
+    public function getStock(int $id): int
+    {
+        $user = auth()->user();
+        $family = $user->family;
+
+        $product = $family->products()->findOrFail($id);
+
+        return $product->stock($family->id);
+    }
+
+    public function destroy(int $id)
+    {
+        $user = auth()->user();
+        $family = $user->family;
+
+        $product = $family->products()->findOrFail($id);
+        $product->delete();
     }
 
 }

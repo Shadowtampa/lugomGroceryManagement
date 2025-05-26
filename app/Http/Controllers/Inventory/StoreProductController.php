@@ -16,17 +16,11 @@ class StoreProductController extends Controller
 
     public function __invoke(StoreProductRequest $request): JsonResponse
     {
-        try {
-            $product = $this->productService->store($request->toArray());
+        $product = $this->productService->store($request->toArray());
 
-            return response()->json([
-                'message' => 'Product criado com sucesso!',
-                'Product' => $product,
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'Product criado com sucesso!',
+            'Product' => $product,
+        ], 201);
     }
 }

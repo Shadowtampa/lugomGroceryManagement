@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Product;
+namespace App\Http\Requests\Inventory;
 
 use App\Enums\UnidadeMedida;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Family;
 
-class StoreProductRequest extends FormRequest
+class UpdateInventoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +24,18 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome' => 'required|string|max:255',
-            'preco' => 'nullable|numeric|min:0',
-            'foto' => 'nullable|string|max:255',
-            'local_compra' => 'nullable|string|max:255',
-            'local_casa' => 'nullable|string|max:255',
-            'departamento' => 'nullable|string|max:255',
-            'unidade_medida' => ['required', 'string', 'in:' . implode(',', array_column(UnidadeMedida::cases(), 'value'))]
+            'stock' => 'required|numeric|min:0',
+            'desirable_stock' => 'required|numeric|min:0',
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'product_id' => $this->route('id')
+        ]);
     }
 }

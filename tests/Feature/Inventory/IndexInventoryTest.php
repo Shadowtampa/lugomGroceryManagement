@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Product;
+namespace Tests\Feature\Inventory;
 
 use App\Models\User;
 use App\Models\Family;
@@ -9,11 +9,11 @@ use App\Models\Inventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class IndexProductTest extends TestCase
+class IndexInventoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_can_list_products_from_their_family()
+    public function test_user_can_list_inventories_from_their_family()
     {
         $family = Family::create([
             'nome' => 'Test Family',
@@ -44,14 +44,14 @@ class IndexProductTest extends TestCase
             'unidade_medida' => 'UN'
         ]);
 
-        Inventory::create([
+        $inventory1 = Inventory::create([
             'family_id' => $family->id,
             'product_id' => $product1->id,
             'stock' => 10,
             'desirable_stock' => 20
         ]);
 
-        Inventory::create([
+        $inventory2 = Inventory::create([
             'family_id' => $family->id,
             'product_id' => $product2->id,
             'stock' => 15,
@@ -61,27 +61,29 @@ class IndexProductTest extends TestCase
         $token = $user->createToken('test-token')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $token)
-            ->getJson('/api/product');
+            ->getJson('/api/inventory');
 
         $response->assertStatus(200)
             ->assertJsonCount(2)
-            ->assertJsonStructure([
-                '*' => [
-                    'id',
-                    'nome',
-                    'preco',
-                    'foto',
-                    'local_compra',
-                    'local_casa',
-                    'departamento',
-                    'unidade_medida',
-                    'created_at',
-                    'updated_at'
+            ->assertJson([
+                [
+                    'id' => $inventory1->id,
+                    'family_id' => $family->id,
+                    'product_id' => $product1->id,
+                    'stock' => 10,
+                    'desirable_stock' => 20
+                ],
+                [
+                    'id' => $inventory2->id,
+                    'family_id' => $family->id,
+                    'product_id' => $product2->id,
+                    'stock' => 15,
+                    'desirable_stock' => 25
                 ]
             ]);
     }
 
-    public function test_user_cannot_see_products_from_another_family()
+    public function test_user_cannot_list_inventories_from_another_family()
     {
         $family1 = Family::create([
             'nome' => 'Test Family 1',
@@ -117,9 +119,26 @@ class IndexProductTest extends TestCase
         $token = $user->createToken('test-token')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $token)
-            ->getJson('/api/product');
+            ->getJson('/api/inventory');
 
         $response->assertStatus(200)
             ->assertJsonCount(0);
+    }
+
+    public function test_user_without_family_cannot_list_inventories()
+    {
+        $user = User::factory()->create([
+            'families_id' => null
+        ]);
+
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/inventory');
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'message' => 'Família não encontrada'
+            ]);
     }
 }

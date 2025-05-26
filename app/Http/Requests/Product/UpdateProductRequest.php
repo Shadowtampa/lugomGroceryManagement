@@ -26,8 +26,6 @@ class UpdateProductRequest extends FormRequest
         return [
             'nome' => 'nullable|required|string|max:255',
             'preco' => 'nullable|numeric|min:0',
-            'quantidade_estoque' => 'nullable|required|integer|min:0',
-            'estoque_desejavel' => 'nullable|integer|min:0',
             'foto' => 'nullable|string|max:255',
             'local_compra' => 'nullable|string|max:255',
             'local_casa' => 'nullable|string|max:255',
@@ -41,10 +39,7 @@ class UpdateProductRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        $family = Family::where('user_id', auth()->id())->firstOrFail();
-
         $this->merge([
-            'families_id' => $family->id,
             'product_id' => $this->route('id')
         ]);
     }

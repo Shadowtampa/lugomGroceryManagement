@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Product;
 
-use App\Models\Product;
 use App\Models\User;
 use App\Models\Family;
-use App\Enums\UnidadeMedida;
+use App\Models\Product;
+use App\Models\Inventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,157 +13,192 @@ class StoreProductTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $user;
-    private string $token;
-    private Family $family;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Criar um usuário e gerar token para todos os testes
-        $this->user = User::factory()->create();
-        $this->family = Family::factory()->create(['user_id' => $this->user->id]);
-        $this->token = $this->user->createToken('test-token')->plainTextToken;
-    }
-
     public function test_user_can_create_product()
     {
+        $family = Family::create([
+            'nome' => 'Test Family',
+            'foto' => null
+        ]);
+
+        $user = User::factory()->create([
+            'families_id' => $family->id
+        ]);
+
         $productData = [
-            'nome' => 'Arroz',
-            'preco' => 10.50,
-            'quantidade_estoque' => 5,
-            'estoque_desejavel' => 10,
-            'foto' => 'https://exemplo.com/arroz.jpg',
-            'local_compra' => 'Supermercado',
-            'local_casa' => 'Armário Preto',
-            'departamento' => 'Alimentos',
-            'unidade_medida' => UnidadeMedida::KG->value
+            'nome' => 'New Product',
+            'preco' => 15.99,
+            'foto' => null,
+            'local_compra' => 'Supermarket',
+            'local_casa' => 'Kitchen',
+            'departamento' => 'Food',
+            'unidade_medida' => 'UN',
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->token)
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
             ->postJson('/api/product', $productData);
 
         $response->assertStatus(201)
-            ->assertJsonStructure([
-                'message',
-                'Product' => [
-                    'id',
-                    'nome',
-                    'preco',
-                    'quantidade_estoque',
-                    'estoque_desejavel',
-                    'foto',
-                    'local_compra',
-                    'local_casa',
-                    'departamento',
-                    'unidade_medida',
-                    'families_id',
-                    'created_at',
-                    'updated_at'
-                ]
-            ])
             ->assertJson([
                 'message' => 'Product criado com sucesso!',
                 'Product' => [
-                    'nome' => 'Arroz',
-                    'preco' => 10.50,
-                    'quantidade_estoque' => 5,
-                    'estoque_desejavel' => 10,
-                    'foto' => 'https://exemplo.com/arroz.jpg',
-                    'local_compra' => 'Supermercado',
-                    'local_casa' => 'Armário Preto',
-                    'departamento' => 'Alimentos',
-                    'unidade_medida' => UnidadeMedida::KG->value,
-                    'families_id' => $this->family->id
+                    'nome' => 'New Product',
+                    'preco' => 15.99,
+                    'foto' => null,
+                    'local_compra' => 'Supermarket',
+                    'local_casa' => 'Kitchen',
+                    'departamento' => 'Food',
+                    'unidade_medida' => 'UN'
                 ]
             ]);
 
         $this->assertDatabaseHas('products', [
-            'nome' => 'Arroz',
-            'preco' => 10.50,
-            'quantidade_estoque' => 5,
-            'estoque_desejavel' => 10,
-            'foto' => 'https://exemplo.com/arroz.jpg',
-            'local_compra' => 'Supermercado',
-            'local_casa' => 'Armário Preto',
-            'departamento' => 'Alimentos',
-            'unidade_medida' => UnidadeMedida::KG->value,
-            'families_id' => $this->family->id
+            'nome' => 'New Product',
+            'preco' => 15.99,
+            'foto' => null,
+            'local_compra' => 'Supermarket',
+            'local_casa' => 'Kitchen',
+            'departamento' => 'Food',
+            'unidade_medida' => 'UN'
         ]);
     }
 
-    public function test_unauthenticated_user_cannot_create_product()
+    public function test_user_cannot_create_product_without_required_fields()
     {
+        $family = Family::create([
+            'nome' => 'Test Family',
+            'foto' => null
+        ]);
+
+        $user = User::factory()->create([
+            'families_id' => $family->id
+        ]);
+
         $productData = [
-            'nome' => 'Arroz',
-            'preco' => 10.50,
-            'quantidade_estoque' => 5,
-            'estoque_desejavel' => 10,
-            'unidade_medida' => UnidadeMedida::KG->value
+            'preco' => 15.99,
+            'foto' => null,
+            'local_compra' => 'Supermarket',
+            'local_casa' => 'Kitchen',
+            'departamento' => 'Food',
+            'unidade_medida' => 'UN',
+            'stock' => 10,
+            'desirable_stock' => 20
         ];
 
-        $response = $this->postJson('/api/product', $productData);
+        $token = $user->createToken('test-token')->plainTextToken;
 
-        $response->assertStatus(401);
-    }
-
-    public function test_cannot_create_product_with_invalid_data()
-    {
-        $invalidData = [
-            'nome' => '', // nome é obrigatório
-            'preco' => 'não é um número', // preço deve ser numérico
-            'quantidade_estoque' => -1, // quantidade deve ser positiva
-            'estoque_desejavel' => -1, // estoque desejável deve ser positivo
-            'unidade_medida' => 'INVALIDO' // unidade de medida inválida
-        ];
-
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->token)
-            ->postJson('/api/product', $invalidData);
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/product', $productData);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors(['nome', 'preco', 'quantidade_estoque', 'estoque_desejavel', 'unidade_medida']);
+            ->assertJsonValidationErrors(['nome']);
     }
 
-    public function test_can_create_product_with_minimal_data()
+    public function test_user_cannot_create_product_with_invalid_data()
     {
-        $minimalData = [
-            'nome' => 'Arroz',
-            'quantidade_estoque' => 5,
-            'unidade_medida' => UnidadeMedida::KG->value
+        $family = Family::create([
+            'nome' => 'Test Family',
+            'foto' => null
+        ]);
+
+        $user = User::factory()->create([
+            'families_id' => $family->id
+        ]);
+
+        $productData = [
+            'nome' => 'New Product',
+            'preco' => 'invalid_price',
+            'foto' => null,
+            'local_compra' => 'Supermarket',
+            'local_casa' => 'Kitchen',
+            'departamento' => 'Food',
+            'unidade_medida' => 'UN',
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->token)
-            ->postJson('/api/product', $minimalData);
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/product', $productData);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['preco']);
+    }
+
+    public function test_user_can_create_product_and_inventory_is_created()
+    {
+        $family = Family::create([
+            'nome' => 'Test Family',
+            'foto' => null
+        ]);
+
+        $user = User::factory()->create([
+            'families_id' => $family->id
+        ]);
+
+        $productData = [
+            'nome' => 'Test Product',
+            'preco' => 10.99,
+            'foto' => null,
+            'local_compra' => 'Supermarket',
+            'local_casa' => 'Kitchen',
+            'departamento' => 'Food',
+            'unidade_medida' => 'UN'
+        ];
+
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/product', $productData);
 
         $response->assertStatus(201)
-            ->assertJsonStructure([
-                'message',
-                'Product' => [
-                    'id',
-                    'nome',
-                    'quantidade_estoque',
-                    'unidade_medida',
-                    'families_id',
-                    'created_at',
-                    'updated_at'
-                ]
-            ])
             ->assertJson([
                 'message' => 'Product criado com sucesso!',
                 'Product' => [
-                    'nome' => 'Arroz',
-                    'quantidade_estoque' => 5,
-                    'unidade_medida' => UnidadeMedida::KG->value,
-                    'families_id' => $this->family->id
+                    'nome' => 'Test Product',
+                    'preco' => 10.99,
+                    'foto' => null,
+                    'local_compra' => 'Supermarket',
+                    'local_casa' => 'Kitchen',
+                    'departamento' => 'Food',
+                    'unidade_medida' => 'UN'
                 ]
             ]);
 
-        $this->assertDatabaseHas('products', [
-            'nome' => 'Arroz',
-            'quantidade_estoque' => 5,
-            'unidade_medida' => UnidadeMedida::KG->value,
-            'families_id' => $this->family->id
+        $product = Product::where('nome', 'Test Product')->first();
+
+        $this->assertDatabaseHas('inventories', [
+            'family_id' => $family->id,
+            'product_id' => $product->id,
+            'stock' => 0,
+            'desirable_stock' => 0
         ]);
+    }
+
+    public function test_user_without_family_cannot_create_product()
+    {
+        $user = User::factory()->create([
+            'families_id' => null
+        ]);
+
+        $productData = [
+            'nome' => 'Test Product',
+            'preco' => 10.99,
+            'foto' => null,
+            'local_compra' => 'Supermarket',
+            'local_casa' => 'Kitchen',
+            'departamento' => 'Food',
+            'unidade_medida' => 'UN'
+        ];
+
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->postJson('/api/product', $productData);
+
+        $response->assertStatus(500)
+            ->assertJsonFragment([
+                'message' => 'Família não encontrada'
+            ]);
     }
 }

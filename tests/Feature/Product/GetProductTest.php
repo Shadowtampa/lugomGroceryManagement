@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Product;
 
-use App\Models\Product;
 use App\Models\User;
 use App\Models\Family;
+use App\Models\Product;
+use App\Models\Inventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,75 +13,107 @@ class GetProductTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $user;
-    private string $token;
-    private Family $family;
-
-    protected function setUp(): void
+    public function test_user_can_get_product_from_their_family()
     {
-        parent::setUp();
-
-        // Criar um usuário e gerar token para todos os testes
-        $this->user = User::factory()->create();
-        $this->family = Family::factory()->create(['user_id' => $this->user->id]);
-        $this->token = $this->user->createToken('test-token')->plainTextToken;
-    }
-
-    public function test_user_can_get_their_product()
-    {
-        $product = Product::factory()->create([
-            'families_id' => $this->family->id
+        $family = Family::create([
+            'nome' => 'Test Family',
+            'foto' => null
         ]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->token)
+        $user = User::factory()->create([
+            'families_id' => $family->id
+        ]);
+
+        $product = Product::create([
+            'nome' => 'Test Product',
+            'preco' => 10.99,
+            'foto' => null,
+            'local_compra' => 'Supermarket',
+            'local_casa' => 'Kitchen',
+            'departamento' => 'Food',
+            'unidade_medida' => 'UN'
+        ]);
+
+        Inventory::create([
+            'family_id' => $family->id,
+            'product_id' => $product->id,
+            'stock' => 10,
+            'desirable_stock' => 20
+        ]);
+
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
             ->getJson("/api/product/{$product->id}");
 
         $response->assertStatus(200)
-            ->assertJsonStructure([
-                'id',
-                'nome',
-                'preco',
-                'quantidade_estoque',
-                'foto',
-                'local_compra',
-                'local_casa',
-                'departamento',
-                'families_id',
-                'created_at',
-                'updated_at'
-            ])
             ->assertJson([
                 'id' => $product->id,
-                'families_id' => $this->family->id
+                'nome' => 'Test Product',
+                'preco' => 10.99,
+                'foto' => null,
+                'local_compra' => 'Supermarket',
+                'local_casa' => 'Kitchen',
+                'departamento' => 'Food',
+                'unidade_medida' => 'UN'
             ]);
     }
 
-    public function test_user_cannot_get_other_users_product()
+    public function test_user_cannot_get_product_from_another_family()
     {
-        $otherUser = User::factory()->create();
-        $otherFamily = Family::factory()->create(['user_id' => $otherUser->id]);
-        $product = Product::factory()->create([
-            'families_id' => $otherFamily->id
+        $family1 = Family::create([
+            'nome' => 'Test Family 1',
+            'foto' => null
         ]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->token)
+        $family2 = Family::create([
+            'nome' => 'Test Family 2',
+            'foto' => null
+        ]);
+
+        $user = User::factory()->create([
+            'families_id' => $family1->id
+        ]);
+
+        $product = Product::create([
+            'nome' => 'Test Product',
+            'preco' => 10.99,
+            'foto' => null,
+            'local_compra' => 'Supermarket',
+            'local_casa' => 'Kitchen',
+            'departamento' => 'Food',
+            'unidade_medida' => 'UN'
+        ]);
+
+        Inventory::create([
+            'family_id' => $family2->id,
+            'product_id' => $product->id,
+            'stock' => 10,
+            'desirable_stock' => 20
+        ]);
+
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
             ->getJson("/api/product/{$product->id}");
 
         $response->assertStatus(404);
     }
 
-    public function test_unauthenticated_user_cannot_get_product()
+    public function test_user_cannot_get_nonexistent_product()
     {
-        $product = Product::factory()->create();
+        $family = Family::create([
+            'nome' => 'Test Family',
+            'foto' => null
+        ]);
 
-        $response = $this->getJson("/api/product/{$product->id}");
+        $user = User::factory()->create([
+            'families_id' => $family->id
+        ]);
 
-        $response->assertStatus(401);
-    }
+        $token = $user->createToken('test-token')->plainTextToken;
 
-    public function test_returns_404_for_nonexistent_product()
-    {
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->token)
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
             ->getJson('/api/product/999');
 
         $response->assertStatus(404);

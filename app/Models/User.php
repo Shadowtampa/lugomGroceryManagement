@@ -8,6 +8,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class User extends Authenticatable
@@ -50,12 +53,10 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all of the comments for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     * Get the post that owns the comment.
      */
-    public function products(): HasManyThrough
+    public function family(): BelongsTo
     {
-        return $this->hasManyThrough(Products::class, Family::class);
+        return $this->belongsTo(Family::class, 'families_id');
     }
 }

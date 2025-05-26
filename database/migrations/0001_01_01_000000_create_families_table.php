@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->string('unidade_medida')->default('UN');
+        Schema::create('families', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+
+            $table->string('nome');
+            $table->string('foto')->nullable();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('unidade_medida');
-        });
+        Schema::dropIfExists('families');
     }
 };

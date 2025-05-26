@@ -6,6 +6,7 @@ use App\Enums\UnidadeMedida;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -18,10 +19,27 @@ class Product extends Model
     ];
 
     /**
-     * Get the user that owns the Product.
+     * Get all of the inventories for the Product
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function family(): BelongsTo
+    public function inventories(): HasMany
     {
-        return $this->belongsTo(Family::class, 'families_id');
+        return $this->hasMany(Inventory::class);
+    }
+
+    /**
+     * Get the stock of the product for a specific family
+     *
+     * @param int $family_id
+     * @return int
+     */
+    public function stock(int $family_id): int
+    {
+        $inventory = $this->inventories()
+            ->where('family_id', $family_id)
+            ->first();
+
+        return $inventory ? $inventory->stock : 0;
     }
 }

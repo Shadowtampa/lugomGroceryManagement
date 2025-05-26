@@ -15,15 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('nome');
             $table->decimal('preco')->nullable();
-            $table->integer('quantidade_estoque')->default(0);
             $table->string('foto')->nullable();
             $table->string('local_compra')->nullable();
             $table->string('departamento')->nullable();
-
+            $table->string('unidade_medida')->default('UN');
             $table->string('local_casa')->nullable();
-
-
-            $table->foreignId('families_id')->constrained()->onDelete('cascade'); // Relacionamento com usuários
 
             $table->timestamps();
         });

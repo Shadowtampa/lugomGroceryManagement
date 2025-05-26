@@ -10,13 +10,16 @@ class GetFamilyController extends Controller
 {
     public function __construct(private FamilyService $familyService) {}
 
-    public function __invoke(int $id): JsonResponse
+    public function __invoke(): JsonResponse
     {
-        try {
-            $family = $this->familyService->get($id);
-            return response()->json($family, 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Família não encontrada'], 404);
+        $family = $this->familyService->get();
+
+        if ($family === null){
+            return response()->json([
+                'message' => 'Família não encontrada'
+             ],404);
         }
+
+        return response()->json($family);
     }
 }

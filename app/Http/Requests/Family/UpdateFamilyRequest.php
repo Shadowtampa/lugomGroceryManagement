@@ -28,16 +28,6 @@ class UpdateFamilyRequest extends FormRequest
     }
 
     /**
-     * Prepare the data for validation.
-     */
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'user_id' => auth()->id()
-        ]);
-    }
-
-    /**
      * Get all the input and files for the request.
      *
      * @param  array|null  $keys

@@ -26,14 +26,4 @@ class StoreFamilyRequest extends FormRequest
             'foto' => 'nullable|string|max:255'
         ];
     }
-
-    /**
-     * Prepare the data for validation.
-     */
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'user_id' => auth()->id(), // Garante que o Family pertence ao usuário autenticado
-        ]);
-    }
 }
